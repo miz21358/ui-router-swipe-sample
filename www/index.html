@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+  <script src="components/loader.js"></script>
+  <script src="script.js"></script>
+
+  <link rel="stylesheet" href="components/loader.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body ng-app="MyApp">
+
+	<ons-page>
+        <!-- ツールバー -->
+		<ons-toolbar>
+			<div class="center">スワイプ処理</div>
+		</ons-toolbar>
+		
+        <!-- 画面のメイン部分 -->
+		<div ng-controller="JSONController">
+			<ons-button ng-click="readJSON();">JSON読み込み</ons-button>
+		</div>
+		
+        <!-- 遷移読込部分 -->
+		<div style="padding: 20px 10px;" ui-view></div>
+		
+        <!-- ローディング読込用ディレクティブ -->
+		<my-loader></my-loader>
+
+	</ons-page>
+	
+	<!-- リスト画面 -->
+	<ons-template id="list.html">
+		<h1>Flower List</h1>
+		<div ng-controller="ListController">
+			<!-- リスト繰り返し -->
+			<h2 ng-repeat="(i, item) in list" ng-click="jumpDetail(i)">
+				<!-- 各名称からリンク(引数にindexをつける) -->
+				{{i}} : {{item.name}}
+			</h2>
+		</div>
+	</ons-template>
+	
+	<!-- 詳細画面 -->
+	<ons-template id="detail.html">
+		<a id="top"></a>
+		<h1>Flower Detail</h1>
+		<!-- コントローラとスワイプ属性 -->
+		<div ng-controller="DetailController" ng-swipe-left="next();" ng-swipe-right="prev();">
+			<!-- リスト繰り返し -->
+			<div ng-repeat="(i, item) in list">
+				<!-- 表示対象indexである場合のみ、表示-->
+			  	<div ng-show="isCurrent(i)" class="slide {{direction}}">
+			  		<!-- 名称 -->
+			  		<h2>{{item.name}}</h2>
+			  		<!-- 解説(HTMLバインドをする) -->
+					<div class="padding" ng-bind-html="item.comment">
+					</div>
+					<!-- ページナビゲーション -->
+					<div class="navi-bottom">
+						<!-- 前に遷移 -->
+						<span class="navi-left" ng-click="prev();">
+							<ons-icon icon="fa-angle-left" size="2x"></ons-icon>
+							<span class="navi-text">{{prevName();}}</span>
+						</span>
+						<!-- 上に遷移 -->
+						<span class="navi-center navi-text" ng-click="top();">
+							{{item.name}}
+						</span>
+						<!-- 次に遷移 -->
+						<span class="navi-right" ng-click="next();">
+							<span class="navi-text">{{nextName();}}</span>
+							<ons-icon icon="fa-angle-right" size="2x"></ons-icon>
+						</span>
+					</div>
+			  	</div>
+			</div>
+		</div>
+	</ons-template>
+	
+    <!-- ローディング画面 -->
+	<ons-template id="loader.html">
+		<div ng-if="$root.isLoading" class="loader-parent"><div class="loader">Loading...</div></div>
+	</ons-template>
+</body>	
+</html>
